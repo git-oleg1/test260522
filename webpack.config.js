@@ -14,15 +14,25 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ]
+      },
+      {
         test: /\.vue$/,
         use: 'vue-loader'
+      },
+      {
+        test: /\.js$/,
+        use: 'babel-loader'
       }
     ]
   },
   plugins: [
 	new HtmlWebpackPlugin({
 		template: path.resolve(__dirname, './src/index.template.html'),
-		// publicPath: '/js'
 	}),
     new VueLoaderPlugin()
   ]
