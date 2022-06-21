@@ -5,7 +5,7 @@
         <p class="text-base md:text-sm text-green-500 font-bold">
           &lt;
           <router-link 
-            :to="{name: 'Home'}" 
+            :to="{name: 'Posts'}"
             class="text-base md:text-sm text-green-500 font-bold no-underline hover:underline"
           >
             К списку новостей
@@ -14,7 +14,7 @@
         <h1 class="font-bold font-sans break-normal text-gray-900 pt-6 pb-2 text-3xl md:text-4xl">{{ post.title }}</h1>
         <p class="text-sm md:text-base font-normal text-gray-600">Published 19 February 2019</p>
 
-        <NewsAuthor />
+        <NewsAuthor :author="post.author" :email="post.email"/>
       </div>
 
       <p class="py-6">
@@ -36,7 +36,7 @@
   import LoadingSpinner from '@c/LoadingSpinner.vue';
   import NextPrevButtons from '@c/NextPrevButtons.vue';
   import NewsAuthor from '@c/NewsAuthor.vue';
-  import { ref, onBeforeMount } from 'vue';
+  import { ref, provide, computed, onBeforeMount } from 'vue';
   import { Api } from '@/api/api';
 
   const props = defineProps({
@@ -45,12 +45,11 @@
 
   const loading = ref(true);
   const post = ref({});
-  const user = ref({});
 
   onBeforeMount(() => {
-    const api = new Api();
+    const api = new Api('local');
     loading.value = true;
-    api.getPost(props.id).then(({data}) => {
+    api.getPost(props.id).then(data => {
       post.value = data;
       loading.value = false;
     });

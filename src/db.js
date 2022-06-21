@@ -193,16 +193,16 @@ export const Utils = {
             if (Utils.isInitialized) {
                 return resolve();
             }
-            console.log('!Utils.isInitialized')
+            console.log('Local DB: !Utils.isInitialized')
             try {
-                console.log('create tables');
+                console.log('Local DB: create tables');
                 this.createTables();
 
-                console.log('fill table users');
+                console.log('Local DB: fill table users');
                 let response = await api.getUsers(undefined, 200);
                 this.fillUsersTable(response.data.users);
 
-                console.log('fill table posts');
+                console.log('Local DB: fill table posts');
                 response = await api.getPosts(null, 200);
                 this.fillPostsTable(response.data.posts);
 
@@ -232,6 +232,7 @@ export const Utils = {
         db.exequteRawSql(`CREATE TABLE IF NOT EXISTS users (
             id INT NOT NULL UNIQUE,
             full_name varchar(64),
+            email varchar(64),
             PRIMARY KEY (id)
         )`);
 
@@ -249,7 +250,8 @@ export const Utils = {
         const db = Db.getInstance().open();
         users.forEach((user) => {
             db.exequteRawSql(`INSERT INTO users VALUES(
-                ${user.id}, '${user.firstName} ${user.lastName}'
+                ${user.id}, '${user.firstName} ${user.lastName}',
+                '${user.email}'
             )`);
         });
     },
