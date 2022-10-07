@@ -70,7 +70,6 @@ Api авторизации при успешном выполнении возв
   function webinar_auth(string $webinar_domain, array $postdata)
   {
     $ch = curl_init();
-    // вместо "webinar.1t.ru" можно указать другой доступный домен например "{$webinar}.webinar.1t.ru"
     curl_setopt($ch, CURLOPT_URL, "https://{$webinar_domain}/api/login");
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata)
     curl_setopt($ch, CURLOPT_POST, 1);
