@@ -46,6 +46,12 @@ Api авторизации при успешном выполнении возв
   // js
 
   const webinar_domain = `sprint.webinar.1t.ru`; // Домен может отличаться, это только пример
+  // Описание пользователя
+  const userdata = {
+    username: 'John Doe', // обязательный
+    email: 'mail@example.com', // обязательный
+    avatar: 'https://example.com/avatar.png', // необязательный
+  };
   // Выполняет авторизацию с использованием АПИ и перенаправляет пользователя на страницу вебинара
   axios.post(`https://${webinar_domain}/api/login`, userdata)
     .then(({data}) => {
