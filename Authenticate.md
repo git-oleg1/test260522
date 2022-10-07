@@ -26,12 +26,12 @@ Api авторизации при успешном выполнении возв
 
 ```json
 {
-  errors: {
-    email: ["The email must be a valid email address."],
-    username: ["The username field is required."]
+  "errors": {
+    "email": ["The email must be a valid email address."],
+    "username": ["The username field is required."]
   },
-  message: "validation error",
-  status: false
+  "message": "validation error",
+  "status": false
 }
 ```
 
@@ -42,12 +42,14 @@ Api авторизации при успешном выполнении возв
 
 ```js
   // js
-
+  const webinarname = 'sprint';
+  const webinar_domain = `${webinarname}.webinar.1t.ru`; // Домен может отличаться
   // Выполняет авторизацию с использованием АПИ и перенаправляет пользователя на страницу вебинара
-  axios.post(`https://webinar.1t.ru/api/${webinar}/login`, userdata)
+  axios.post(`https://${webinar_domain}/api/${webinarname}/login`, userdata)
     .then(({data}) => {
       // navigate browser to webinars login page
-      window.location.href = `https://${webinar}.webinar.1t.ru?token=${data.token}&redirect=/`;
+      // redirect нужен для редиректа после проверки токена
+      window.location.href = `https://${webinar_domain}/login?token=${data.token}&redirect=/`;
     })
     .catch((error) => {
       // errors handle
