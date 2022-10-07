@@ -82,7 +82,6 @@ Api авторизации при успешном выполнении возв
 
   $access_token = webinar_auth('sprint.webinar.1t.ru', ['username' => 'Альберт', 'email' => 'test@example.mail']);
 
-  // in view use token
-  // redirect=/ указывается для автоматического редиректа на главную страницу вебинара, после проверки
+  //  Использование токена при рендеринге страницы (in view)
   <a href="{{ "https://sprint.webinar.1t.ru/login?token={$access_token}" }}">Перейти в вебинар авторизованным</a>
 ```
