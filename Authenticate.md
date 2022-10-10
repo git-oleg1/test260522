@@ -1,16 +1,22 @@
 ## API для авторизации
 
-Для внешней авторизации, нужно выполнить POST запрос по адресу `https://<webinar-domain>/api/login`, где `<webinar-domain>` - это зарегистрированнное доменное имя вебинара, передав такие параметры:
+Для внешней авторизации, нужно выполнить POST запрос по адресу `https://<webinar-server>/api/login`, где `<webinar-server>` - это зарегистрированнное доменное имя вебинара (по умолчанию `app.webinar.1t.ru`), передав такие параметры:
 
 - Обязательные
-  - username - ФИО пользователя
-  - email - Email пользователя
+
+| Параметр | Описание           |
+|----------|--------------------|
+| username | ФИО пользователя   |
+| email    | Email пользователя |
 
 - Необязательные
-  - avatar - url картинки, которая может использоваться в качестве аватара пользователя
-  - phone - телефон
-  - work - место работы
-  - post - должность
+
+| Параметр | Описание                                                                   |
+|----------|----------------------------------------------------------------------------|
+| avatar   | url картинки, которая может использоваться в качестве аватара пользователя |
+| phone    | телефон                                                                    |
+| work     | место работы                                                               |
+| post     | должность                                                                  |
 
 Api авторизации при успешном выполнении возвращает json объект такого вида:
 
@@ -18,12 +24,9 @@ Api авторизации при успешном выполнении возв
 {
   "message": "Successful",
   "status": true,
-  "token": "hash-string"
+  "redirect": "https://<webinar-domain>?token=<token>"
 }
 ```
-
-где наибольшую ценность представляет аттрибут `token`.
-
 
 Если запрос не прошел валидацию, будет возвращен json объект и статус 422:
 
@@ -37,15 +40,14 @@ Api авторизации при успешном выполнении возв
   "status": false
 }
 ```
-
-После получения токена, чтобы закончить авторизацию, нужно перейти к вебинару по адресу `https://<webinar-domain>/login?token=<token>`. В случае успешной проверки токена, браузер будет направлен на главную страницу вебинара, иначе будет показано сообщение об ошибке.
+После успешного выполнения запроса авторизации нербходимо направить браузер пользователя использовав параметр redirect json объекта, который вернул сервер.
 
 Пример:
 
 ```js
   // js
 
-  const webinar_domain = `sprint.webinar.1t.ru`; // Домен может отличаться, это только пример
+  const webinar_server = `sprint.webinar.1t.ru`; // Домен может отличаться, это только пример
   // Описание пользователя
   const userdata = {
     username: 'John Doe', // обязательный
@@ -53,11 +55,13 @@ Api авторизации при успешном выполнении возв
     avatar: 'https://example.com/avatar.png', // необязательный
   };
   // Выполняет авторизацию с использованием АПИ и перенаправляет пользователя на страницу вебинара
-  axios.post(`https://${webinar_domain}/api/login`, userdata)
+  axios.post(`https://${webinar_server}/api/login`, userdata)
     .then(({data}) => {
-      // Направить браузер на страницу вебинара, где будет проверен токе
-      // и пользователь сможет пользоваться вебинаром
-      window.location.href = `https://${webinar_domain}/login?token=${data.token}`;
+      if (!data.redirect) {
+        throw new Error("Адрес вебинара не найден");
+      }
+      // Направить браузер на страницу вебинара, где пользователь уже будет авторизован
+      window.location.href = data.redirect;
     })
     .catch((error) => {
       // errors handle
@@ -67,20 +71,20 @@ Api авторизации при успешном выполнении возв
 ```php
   // php
 
-  function webinar_auth(string $webinar_domain, array $postdata)
+  function webinar_auth(string $webinar_server, array $postdata)
   {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://{$webinar_domain}/api/login");
+    curl_setopt($ch, CURLOPT_URL, "https://{$webinar_server}/api/login");
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata)
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $output = json_decode(curl_exec($ch));
     curl_close($ch);
-    return $output['token'];
+    return $output['redirect'];
   }
 
-  $access_token = webinar_auth('sprint.webinar.1t.ru', ['username' => 'Альберт', 'email' => 'test@example.mail']);
+  $webinarUrl = webinar_auth('sprint.webinar.1t.ru', ['username' => 'Альберт', 'email' => 'test@example.mail']);
 
-  //  Использование токена при рендеринге страницы (in view)
-  <a href="{{ "https://sprint.webinar.1t.ru/login?token={$access_token}" }}">Перейти в вебинар авторизованным</a>
+  // рендеринг страницы (in view)
+  <a href="{{ $webinarUrl }}">Перейти в вебинар авторизованным</a>
 ```
